@@ -1,5 +1,16 @@
 function getRandomFishName() {
-  const fishNames = ["Bubbles", "Finley", "Scales", "Marina", "Nemo", "Dory", "Splash", "Moby", "Gill", "Coral"];
+  const fishNames = [
+    "Bubbles",
+    "Finley",
+    "Scales",
+    "Marina",
+    "Nemo",
+    "Dory",
+    "Splash",
+    "Moby",
+    "Gill",
+    "Coral",
+  ];
   return fishNames[Math.floor(Math.random() * fishNames.length)];
 }
 function Fish(AI, x, y, size, dir, frame) {
@@ -35,7 +46,7 @@ function Fish(AI, x, y, size, dir, frame) {
   this.deathParticles = [];
   this.bodyColor = randCol.rgb();
   this.bodyOutline = randCol.rgb();
-  this.name = AI ? getRandomFishName() : '';
+  this.name = AI ? getRandomFishName() : "";
 
   // is the user currently pressing a button to move?
   this.isInput = AI ? true : false;
@@ -46,7 +57,7 @@ function Fish(AI, x, y, size, dir, frame) {
 
   this.velocity = [0, 0];
   this.accel = [0, 0];
-  this.maxSpeed = this.AI ? 3+Math.random() * 2 : 6;
+  this.maxSpeed = this.AI ? 3 + Math.random() * 2 : 6;
   this.energy = this.size;
 }
 this.moveEnergy = 20;
@@ -78,12 +89,12 @@ Fish.prototype.draw = function (outputCtx) {
     -this.canv.height / 2
   );
   outputCtx.restore();
-    if (this.AI && this.name) {
+  if (this.AI && this.name) {
     // Ensure the text is aligned correctly relative to the canvas
     outputCtx.save();
-    outputCtx.fillStyle = 'white'; // Text color
-    outputCtx.font = '28px Arial'; // Text font and size
-    outputCtx.textAlign = 'center'; // Center the text horizontally
+    outputCtx.fillStyle = "white"; // Text color
+    outputCtx.font = "28px Arial"; // Text font and size
+    outputCtx.textAlign = "center"; // Center the text horizontally
     outputCtx.fillText(this.name, this.x, this.y - this.size - 10); // Draw the name above the fish
     outputCtx.restore();
   }
@@ -148,56 +159,65 @@ Fish.prototype.drawBody = function () {
 
     this.ctx.bezierCurveTo(
       this.size * (14 / 15),
-      i * this.size / 2 + (this.size / 30) * o + this.curv / 3,
+      (i * this.size) / 2 + (this.size / 30) * o + this.curv / 3,
       -this.size * (3 / 15),
-      i * this.size * 9 / 15 + (this.size / 30) * o + this.curv / 2,
-      -this.size * 1 / 4,
-      (i * this.size) * 10 / 15 + (this.size / 15) * o + this.curv / 2
+      (i * this.size * 9) / 15 + (this.size / 30) * o + this.curv / 2,
+      (-this.size * 1) / 4,
+      (i * this.size * 10) / 15 + (this.size / 15) * o + this.curv / 2
     );
 
     this.ctx.bezierCurveTo(
-      -this.size * 9 / 15,
-      i * this.size * 11 / 15 + (this.size / 30) * o + this.curv / 3,
-      -this.size * 2 / 3,
-      i * this.size * 5 / 5 + (this.size / 30) * o + this.curv / 2,
+      (-this.size * 9) / 15,
+      (i * this.size * 11) / 15 + (this.size / 30) * o + this.curv / 3,
+      (-this.size * 2) / 3,
+      (i * this.size * 5) / 5 + (this.size / 30) * o + this.curv / 2,
       -this.size * 1,
-      (i * this.size) * 16 / 15 + (this.size / 15) * o + this.curv
+      (i * this.size * 16) / 15 + (this.size / 15) * o + this.curv
     );
 
     this.ctx.bezierCurveTo(
-      -this.size * 14 / 15,
-      i * this.size * 10 / 15 + (this.size / 30) * o + this.curv / 3,
-      -this.size * 16 / 15,
-      i * this.size * 6 / 15 + (this.size / 30) * o + this.curv / 2,
-      -this.size * 16 / 15,
-      (i * this.size) * 8 / 15 + (this.size / 15) * o + this.curv
+      (-this.size * 14) / 15,
+      (i * this.size * 10) / 15 + (this.size / 30) * o + this.curv / 3,
+      (-this.size * 16) / 15,
+      (i * this.size * 6) / 15 + (this.size / 30) * o + this.curv / 2,
+      (-this.size * 16) / 15,
+      (i * this.size * 8) / 15 + (this.size / 15) * o + this.curv
     );
 
     this.ctx.bezierCurveTo(
       -this.size * 2.5,
       (i * this.size) / 6 + (this.size / 10) * o + this.curv / 3,
       -this.size * 2.6,
-      (i * this.size) * 4 / 15 + (this.size / 15) * o + this.curv / 2,
-      -this.size * 3 - Math.sin(i * this.size / Math.PI) * o * 2,
-      (i * this.size * 3 / 15) + Math.cos(i * this.size / Math.PI) * o * 2 + (this.size / 15) * o + this.curv / 3
+      (i * this.size * 4) / 15 + (this.size / 15) * o + this.curv / 2,
+      -this.size * 3 - Math.sin((i * this.size) / Math.PI) * o * 2,
+      (i * this.size * 3) / 15 +
+        Math.cos((i * this.size) / Math.PI) * o * 2 +
+        (this.size / 15) * o +
+        this.curv / 3
     );
 
     this.ctx.bezierCurveTo(
       -this.size * 3.2,
-      (i * this.size) * 3 / 15 + (this.size / 10) * o + this.curv / 3,
+      (i * this.size * 3) / 15 + (this.size / 10) * o + this.curv / 3,
       -this.size * 3.3,
-      (i * this.size) * 9 / 15 + (this.size / 15) * o + this.curv / 2,
-      -this.size * 3.5 - Math.sin(i * this.size / Math.PI) * o * 3,
-      (i * this.size) * 8 / 15 + Math.cos(i * this.size / Math.PI) * o * 2 + (this.size / 15) * o + this.curv / 3
+      (i * this.size * 9) / 15 + (this.size / 15) * o + this.curv / 2,
+      -this.size * 3.5 - Math.sin((i * this.size) / Math.PI) * o * 3,
+      (i * this.size * 8) / 15 +
+        Math.cos((i * this.size) / Math.PI) * o * 2 +
+        (this.size / 15) * o +
+        this.curv / 3
     );
 
     this.ctx.bezierCurveTo(
       -this.size * 3.5,
-      (i * this.size) * 5 / 15 + (this.size / 10) * o + this.curv / 3,
+      (i * this.size * 5) / 15 + (this.size / 10) * o + this.curv / 3,
       -this.size * 3.5,
-      (i * this.size) * 3 / 15 + (this.size / 15) * o + this.curv / 2,
+      (i * this.size * 3) / 15 + (this.size / 15) * o + this.curv / 2,
       -this.size * 3.3,
-      (-this.size / 15) * o + Math.cos(i * this.size / Math.PI) * o * 4 + (this.size / 15) * o + this.curv / 3
+      (-this.size / 15) * o +
+        Math.cos((i * this.size) / Math.PI) * o * 4 +
+        (this.size / 15) * o +
+        this.curv / 3
     );
 
     // this.ctx.bezierCurveTo(
@@ -211,6 +231,33 @@ Fish.prototype.drawBody = function () {
   }
   this.ctx.stroke();
   this.ctx.fill();
+
+  // Draw eyes
+  this.ctx.fillStyle = "black";
+  this.ctx.strokeStyle = "white";
+  this.ctx.lineWidth = 3;
+  this.ctx.beginPath();
+  this.ctx.arc(
+    this.size * (5 / 15),
+    -this.size * (6 / 15),
+    this.size / 6,
+    0,
+    2 * Math.PI,
+    false
+  );
+  this.ctx.fill();
+  this.ctx.stroke();
+  this.ctx.beginPath();
+  this.ctx.arc(
+    this.size * (5 / 15),
+    this.size * (6 / 15),
+    this.size / 6,
+    0,
+    2 * Math.PI,
+    false
+  );
+  this.ctx.fill();
+  this.ctx.stroke();
 };
 Fish.prototype.drawColors = function () {
   var i, l, c;
@@ -285,17 +332,16 @@ Fish.prototype.collide = function (fish) {
 
   return false;
 };
-Fish.prototype.killedBy = function(target, score, user) {
+Fish.prototype.killedBy = function (target, score, user) {
   this.dying = true;
-  if(!this.AI || !target.AI){ 
+  if (!this.AI || !target.AI) {
     playPop();
-    if(user){
-
+    if (user) {
       score++;
-      var scoreElement = document.querySelector(".scoreText"); 
+      var scoreElement = document.querySelector(".scoreText");
       if (scoreElement) {
-        scoreElement.innerText = score; 
-      }  
+        scoreElement.innerText = score;
+      }
     }
   }
   this.deathParticles = this.toParticles(target);
@@ -303,10 +349,10 @@ Fish.prototype.killedBy = function(target, score, user) {
   return score;
 
   const bodyOutline = target.bodyOutline;
-  target.bodyOutline = new Color(255,255,255).rgb();
+  target.bodyOutline = new Color(255, 255, 255).rgb();
   setTimeout(function () {
     target.bodyOutline = bodyOutline;
-  }, 300)
+  }, 300);
 };
 var r, g, b;
 Fish.prototype.toParticles = function (target) {
@@ -348,11 +394,11 @@ Fish.prototype.toParticles = function (target) {
       col,
       target,
       Math.PI * Math.random() * 2 - Math.PI,
-      this.size / 20,
+      this.size / 20
     );
-    setTimeout(function(){
-      new_particle.dead = true
-    }, Math.random() * 700 + 100)
+    setTimeout(function () {
+      new_particle.dead = true;
+    }, Math.random() * 700 + 100);
     particles.push(new_particle);
   }
   return particles;
@@ -392,7 +438,7 @@ Fish.prototype.physics = function (player) {
     for (i = this.deathParticles.length - 1; i >= 0; i--) {
       p = this.deathParticles[i];
       // if (p.physics() < p.target.size / 8 + 10) {
-        if (p.dead === true) {
+      if (p.dead === true) {
         this.deathParticles.splice(i, 1);
 
         p.target.setSize(p.target.size + 0.001 * (isMobile ? 6 : 1));
@@ -427,11 +473,20 @@ Fish.prototype.physics = function (player) {
     }
 
     if (this.AI) {
-      if (!player.dead && distance(this, player) < Math.min($canv.width, $canv.height) * 0.35) {
+      if (
+        !player.dead &&
+        distance(this, player) < Math.min($canv.width, $canv.height) * 0.35
+      ) {
         if (this.size > player.size) {
           this.targetDir = directionTowards(player, this);
         } else {
-          this.targetDir = directionTowards({ x: this.x + (this.x-player.x)/2, y: this.y + (this.y-player.y)/2 }, this);
+          this.targetDir = directionTowards(
+            {
+              x: this.x + (this.x - player.x) / 2,
+              y: this.y + (this.y - player.y) / 2,
+            },
+            this
+          );
         }
       } else {
         // random walk
