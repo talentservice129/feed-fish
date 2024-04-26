@@ -42,6 +42,7 @@ function setGlobals() {
     [255, 192, 203], // Pink
     [128, 128, 0], // Olive
   ];
+  window.playerSize = [16, 18, 19, 22, 25, 28, 31, 34, 37, 40, 46];
 
   ctx.lineJoin = "round";
   window.debug = false; // true
@@ -96,12 +97,16 @@ function init() {
     GAME.player,
     GAME.fishes
   );
+  GAME.level = 0;
   GAME.levelParticles = [];
   GAME.levelBar = new LevelBar($canv.width);
   GAME.levelBalls = new LevelBalls($canv.width, $canv.height);
   GAME.levelBallParticles = [];
   GAME.endGameParticles = [];
+  GAME.levelUpParticles = [];
   GAME.firstLoop = true;
+  // Boost
+  GAME.boostDuration = 0;
   var w = $canv.width * 0.1;
 
   GAME.smallMap = new SmallMap($canv.width - w - 40, 40, w, w, 0.1);
@@ -121,6 +126,17 @@ function draw(time) {
   var i, l, j, dist, nextStage, fish, fish2;
 
   lag += time - previousTime;
+  if (mouseDown && score > 0) {
+    GAME.boostDuration += time - previousTime;
+    if (GAME.boostDuration >= 1000) {
+      GAME.boostDuration -= 1000;
+      score--;
+      var scoreElement = document.querySelector(".scoreText");
+      if (scoreElement) {
+        scoreElement.innerText = score;
+      }
+    }
+  }
   previousTime = time;
 
   if (GAME.state === "playing") {
@@ -139,6 +155,7 @@ function draw(time) {
   var fishes = GAME.fishes;
   var spawner = GAME.spawner;
   var levelParticles = GAME.levelParticles;
+  var levelUpParticles = GAME.levelUpParticles;
   var levelBar = GAME.levelBar;
   var levelBalls = GAME.levelBalls;
   var levelBallParticles = GAME.levelBallParticles;
@@ -189,8 +206,9 @@ function draw(time) {
     // static position objects
     levelBar.draw(ctx);
     paintLevelParticles();
+    paintLevelUpParticles();
     paintLevelBallParticles();
-    levelBalls.draw(ctx);
+    // levelBalls.draw(ctx);
 
     // dynamic position objects
     ctx.save();
@@ -208,13 +226,25 @@ function draw(time) {
     // levelBar level up
     nextStage = levelBar.physics();
     if (nextStage) {
-      GAME.levelBallParticles = levelBallParticles.concat(
-        levelBar.toParticles(levelBalls)
-      );
-      levelBalls.nextColors = levelBar.colors.slice(0, 2);
+      var newParticles = levelBar.toParticles({
+        x: $canv.width / 2,
+        y: $canv.height / 2,
+      });
+      // staticly position
+      // for (i = 0; i < newParticles.length; i++) {
+      //   newParticles[i].x += -player.x;
+      //   newParticles[i].y += -player.y;
+      // }
+
+      GAME.levelUpParticles = levelUpParticles.concat(newParticles);
+      // GAME.levelBallParticles = levelBallParticles.concat(
+      //   levelBar.toParticles(player)
+      // );
+      // levelBalls.nextColors = levelBar.colors.slice(0, 2);
 
       // reset levelBar
       GAME.levelBar = new LevelBar($canv.width);
+      GAME.level++;
     }
 
     // levelBar Particles physics
@@ -229,6 +259,19 @@ function draw(time) {
         }
         if (levelParticles.length === 0) {
           levelBar.updating = false;
+        }
+      }
+    }
+
+    for (i = levelUpParticles.length - 1; i >= 0; i--) {
+      p = levelUpParticles[i];
+      if (p.physics() < player.size / 8 + 10) {
+        // if (p.dead === true) {
+        levelUpParticles.splice(i, 1);
+        if (levelUpParticles.length === 0) {
+          if (GAME.level <= 10) {
+            GAME.player.setSize(playerSize[GAME.level]);
+          }
         }
       }
     }
@@ -249,21 +292,21 @@ function draw(time) {
       GAME.levelBalls = new LevelBalls($canv.width, $canv.height);
     }
 
-    i = levelBallParticles.length;
-    while (i-- > 0) {
-      dist = levelBallParticles[i].physics();
-      if (dist < 10) {
-        levelBallParticles.splice(i, 1);
-        if (!levelBalls.updating) {
-          levelBalls.updating = true;
-          levelBalls.addBall();
-        }
-        if (levelBallParticles.length === 0) {
-          levelBalls.updating = false;
-          levelBalls.shift();
-        }
-      }
-    }
+    // i = levelBallParticles.length;
+    // while (i-- > 0) {
+    //   dist = levelBallParticles[i].physics();
+    //   if (dist < 10) {
+    //     levelBallParticles.splice(i, 1);
+    //     if (!levelBalls.updating) {
+    //       levelBalls.updating = true;
+    //       levelBalls.addBall();
+    //     }
+    //     if (levelBallParticles.length === 0) {
+    //       levelBalls.updating = false;
+    //       levelBalls.shift();
+    //     }
+    //   }
+    // }
   }
 
   function endGameParticlePhysics() {
@@ -357,6 +400,12 @@ function draw(time) {
     }
   }
 
+  function paintLevelUpParticles() {
+    for (i = -1, l = levelUpParticles.length; ++i < l; ) {
+      levelUpParticles[i].draw(ctx); // iterate levelUpParticles
+    }
+  }
+
   function paintLevelBallParticles() {
     for (i = -1, l = levelBallParticles.length; ++i < l; ) {
       levelBallParticles[i].draw(ctx);
@@ -392,6 +441,12 @@ function loadAssets(cb) {
     { name: "soundOn", src: "assets/sound-on.png" },
     { name: "soundOff", src: "assets/sound-off.png" },
     { name: "enter", src: "assets/enter.png" },
+    { name: "eye-1", src: "assets/eyes/eye-1.png" },
+    { name: "eye-2", src: "assets/eyes/eye-2.png" },
+    { name: "eye-3", src: "assets/eyes/eye-3.png" },
+    { name: "eye-4", src: "assets/eyes/eye-4.png" },
+    { name: "eye-5", src: "assets/eyes/eye-5.png" },
+    { name: "eye-6", src: "assets/eyes/eye-6.png" },
   ];
 
   function process() {

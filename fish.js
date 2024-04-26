@@ -1,3 +1,4 @@
+const fishSizes = [15, 18, 21, 24, 27, 30, 33, 36, 39, 45];
 function getRandomFishName() {
   const fishNames = [
     "Bubbles",
@@ -30,7 +31,7 @@ function Fish(AI, x, y, size, dir, frame) {
   });
 
   this.AIDir = 1;
-  this.setSize(size || 20);
+  this.setSize(size || 16);
 
   this.frame = frame || 0;
   this.ossilation = Math.sin(frame / 5);
@@ -44,6 +45,7 @@ function Fish(AI, x, y, size, dir, frame) {
   this.dying = false; // death animation
   this.dead = false; // remove this entity
   this.deathParticles = [];
+  this.eye = Math.ceil(Math.random() * 6);
   this.bodyColor = randCol.rgb();
   this.bodyOutline = randCol.rgb();
   this.name = AI ? getRandomFishName() : "";
@@ -233,31 +235,20 @@ Fish.prototype.drawBody = function () {
   this.ctx.fill();
 
   // Draw eyes
-  this.ctx.fillStyle = "black";
-  this.ctx.strokeStyle = "white";
-  this.ctx.lineWidth = 3;
-  this.ctx.beginPath();
-  this.ctx.arc(
+  this.ctx.drawImage(
+    ASSETS["eye-" + this.eye],
     this.size * (5 / 15),
-    -this.size * (6 / 15),
-    this.size / 6,
-    0,
-    2 * Math.PI,
-    false
+    -this.size * (7 / 15),
+    this.size / 3,
+    this.size / 3
   );
-  this.ctx.fill();
-  this.ctx.stroke();
-  this.ctx.beginPath();
-  this.ctx.arc(
+  this.ctx.drawImage(
+    ASSETS["eye-" + this.eye],
     this.size * (5 / 15),
-    this.size * (6 / 15),
-    this.size / 6,
-    0,
-    2 * Math.PI,
-    false
+    this.size * (2 / 15),
+    this.size / 3,
+    this.size / 3
   );
-  this.ctx.fill();
-  this.ctx.stroke();
 };
 Fish.prototype.drawColors = function () {
   var i, l, c;
@@ -337,7 +328,7 @@ Fish.prototype.killedBy = function (target, score, user) {
   if (!this.AI || !target.AI) {
     playPop();
     if (user) {
-      score++;
+      score += 5 + fishSizes.findIndex((size) => size == this.size);
       var scoreElement = document.querySelector(".scoreText");
       if (scoreElement) {
         scoreElement.innerText = score;
@@ -441,7 +432,7 @@ Fish.prototype.physics = function (player) {
       if (p.dead === true) {
         this.deathParticles.splice(i, 1);
 
-        p.target.setSize(p.target.size + 0.001 * (isMobile ? 6 : 1));
+        // p.target.setSize(p.target.size + 0.001 * (isMobile ? 6 : 1));
         if (this.colors.length > 0) {
           for (var i = this.colors.length - 1; i >= 0; i--) {
             this.colors[i].loaded = 0;

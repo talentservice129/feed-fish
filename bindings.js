@@ -58,12 +58,12 @@ function touchDown(e) {
   e.preventDefault();
   var pos = eventPos(e);
   if (GAME.state === "playing") {
+    mouseDown = score > 0;
     GAME.player.updateInput(
       [pos.x - $canv.width / 2, pos.y - $canv.height / 2],
       true,
-      true
+      mouseDown
     );
-    mouseDown = true;
   } else if (GAME.state === "menu" && GAME.MENU.button) {
     if (collideBox(pos, GAME.MENU.button)) {
       if (window.isMobile) {
@@ -154,7 +154,7 @@ function touchMove(e) {
       true,
       false
     );
-    if (mouseDown) {
+    if (mouseDown && score > 0) {
       GAME.player.updateInput(
         [pos.x - $canv.width / 2, pos.y - $canv.height / 2],
         true,
@@ -205,14 +205,14 @@ if (window.isMobile) {
     ];
     if (GAME.state === "playing") {
       GAME.player.updateInput(pos, true, false);
-      if (mouseDown) {
+      if (mouseDown && score > 0) {
         GAME.player.updateInput(pos, true, true);
       }
     }
   });
   window.$boost.addEventListener("touchstart", (_) => {
-    GAME.player.updateInput([], true, true);
-    mouseDown = true;
+    mouseDown = score > 0;
+    GAME.player.updateInput([], true, mouseDown);
   });
   window.$boost.addEventListener("touchend", (e) => {
     e.preventDefault();
