@@ -26,7 +26,7 @@ function resizeWindow() {
     GAME.spawner.resize($canv.width, $canv.height);
     GAME.levelBar.resize($canv.width, $canv.height);
     GAME.levelBalls.resize($canv.width, $canv.height);
-  } else {
+  } else if (GAME.state === "menu") {
     if (ASSETS.loaded) drawMenu();
   }
 }
@@ -137,6 +137,8 @@ function touchUp(e) {
   } else if (GAME.state === "menu" && GAME.MENU.button) {
     drawMenuButton(initializeOnUp);
     if (initializeOnUp) {
+      var textInput = document.getElementById("menuTextInput");
+      textInput.style.display = "none";
       init();
       initializeOnUp = false;
     }
@@ -211,12 +213,38 @@ if (window.isMobile) {
     }
   });
   window.$boost.addEventListener("touchstart", (_) => {
+    popSound.src = "assets/boost_final.mp3";
+    popSound.play();
+    console.log(popSound.src);
     mouseDown = score > 0;
     GAME.player.updateInput([], true, mouseDown);
   });
   window.$boost.addEventListener("touchend", (e) => {
     e.preventDefault();
+    popSound.pause();
+    popSound.currentTime = 0;
     GAME.player.updateInput([], true, false);
     mouseDown = false;
   });
 }
+
+changeSkinElement = document.getElementById("settingButton");
+changeSkinElement.addEventListener("click", function (e) {
+  GAME.state = "setting";
+  var textInput = document.getElementById("menuTextInput");
+  textInput.style.display = "none";
+  var fish = new Fish(
+    false,
+    $canv.width / 2,
+    $canv.height / 2,
+    30,
+    Math.PI / 4
+  );
+
+  // Clear the canvas before drawing the new frame
+  ctx.clearRect(0, 0, $canv.width, $canv.height);
+
+  // Draw the fish onto the setting canvas
+  fish.draw(ctx);
+  fish.drawBody(ctx);
+});

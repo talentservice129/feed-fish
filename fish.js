@@ -91,6 +91,18 @@ Fish.prototype.draw = function (outputCtx) {
     -this.canv.height / 2
   );
   outputCtx.restore();
+
+  if (this === GAME.player && GAME.state === "playing") {
+    // Ensure the text is aligned correctly relative to the canvas
+    outputCtx.save();
+    outputCtx.textAlign = "center"; // Center the text horizontally
+    outputCtx.textBaseline = "bottom"; // Align the text bottom
+    outputCtx.fillStyle = "#FFF"; // White color text
+    outputCtx.font = "20px Arial"; // Set font size and family
+    outputCtx.fillText(this.name, this.x, this.y - this.size * 0.6); // Position text above fish
+    outputCtx.restore();
+  }
+
   if (this.AI && this.name) {
     // Ensure the text is aligned correctly relative to the canvas
     outputCtx.save();
@@ -325,6 +337,7 @@ Fish.prototype.collide = function (fish) {
 };
 Fish.prototype.killedBy = function (target, score, user) {
   this.dying = true;
+  popSound.src = "assets/drop1.ogg";
   if (!this.AI || !target.AI) {
     playPop();
     if (user) {
@@ -443,6 +456,9 @@ Fish.prototype.physics = function (player) {
     }
     if (!this.deathParticles.length) {
       this.dead = true;
+      if (this == player) {
+        GAME.state = "menu";
+      }
     }
   } else {
     // update collision circles

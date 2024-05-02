@@ -1,10 +1,10 @@
 .zone {
-    visibility: hidden;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 150px;
-    height: 150px;
+  visibility: hidden;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 150px;
+  height: 150px;
 }
 .fire {
   visibility: hidden;
@@ -21,9 +21,9 @@
   border: 0;
   background: none;
   outline: 0;
-  transition: opacity .3s ease;
+  transition: opacity 0.3s ease;
 }
-.fire:before,
+
 .fire:after {
   content: "";
   display: block;
@@ -34,6 +34,22 @@
   border-radius: 50%;
   position: absolute;
 }
+
+.fire:before {
+  content: "";
+  display: block;
+  width: 0;
+  height: 0;
+  border-left: 25px solid transparent;
+  border-right: 25px solid transparent;
+  border-bottom: 43px solid white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.5;
+}
+
 .fire:after {
   width: 100%;
   height: 100%;
