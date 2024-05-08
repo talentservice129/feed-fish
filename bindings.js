@@ -26,7 +26,7 @@ function resizeWindow() {
     GAME.spawner.resize($canv.width, $canv.height);
     GAME.levelBar.resize($canv.width, $canv.height);
     GAME.levelBalls.resize($canv.width, $canv.height);
-  } else {
+  } else if (GAME.state === "menu") {
     if (ASSETS.loaded) drawMenu();
   }
 }
@@ -64,15 +64,6 @@ function touchDown(e) {
       true,
       mouseDown
     );
-  } else if (GAME.state === "menu" && GAME.MENU.button) {
-    if (collideBox(pos, GAME.MENU.button)) {
-      if (window.isMobile) {
-        $wheel.style.visibility = "visible";
-        $boost.style.visibility = "visible";
-      }
-      drawMenuButton(true);
-      initializeOnUp = true;
-    }
   }
 
   // audio
@@ -134,13 +125,14 @@ function touchUp(e) {
   if (GAME.state === "playing") {
     GAME.player.updateInput([], true, false);
     mouseDown = false;
-  } else if (GAME.state === "menu" && GAME.MENU.button) {
-    drawMenuButton(initializeOnUp);
-    if (initializeOnUp) {
-      init();
-      initializeOnUp = false;
-    }
   }
+  // else if (GAME.state === "menu" && GAME.MENU.button) {
+  //   drawMenuButton(initializeOnUp);
+  //   if (initializeOnUp) {
+  //     init();
+  //     initializeOnUp = false;
+  //   }
+  // }
 }
 
 $canv.addEventListener("mousemove", touchMove);
@@ -212,11 +204,56 @@ if (window.isMobile) {
   });
   window.$boost.addEventListener("touchstart", (_) => {
     mouseDown = score > 0;
+    if (mouseDown) {
+      playBoost();
+      window.$boost.classList.add("active");
+    }
     GAME.player.updateInput([], true, mouseDown);
   });
   window.$boost.addEventListener("touchend", (e) => {
     e.preventDefault();
+    pauseBoost();
+    window.$boost.classList.remove("active");
     GAME.player.updateInput([], true, false);
     mouseDown = false;
   });
 }
+
+var textInput = document.getElementById("menuTextInput");
+textInput.addEventListener("input", function (event) {
+  if (GAME && GAME.player) {
+    GAME.player.name = event.target.value;
+  }
+});
+
+var play = document.querySelector(".play");
+play.addEventListener("click", function () {
+  if (GAME.state === "menu") {
+    if (window.isMobile) {
+      $wheel.style.visibility = "visible";
+      $boost.style.visibility = "visible";
+    }
+    init();
+  }
+});
+
+changeSkinElement = document.getElementById("settingButton");
+changeSkinElement.addEventListener("click", function (e) {
+  GAME.state = "setting";
+  var main = document.querySelector(".main");
+  main.style.display = "none";
+  var fish = new Fish(
+    false,
+    $canv.width / 2,
+    $canv.height / 2,
+    30,
+    Math.PI / 4
+  );
+
+  // Clear the canvas before drawing the new frame
+  ctx.clearRect(0, 0, $canv.width, $canv.height);
+
+  // Draw the fish onto the setting canvas
+  fish.draw(ctx);
+  fish.drawBody(ctx);
+});

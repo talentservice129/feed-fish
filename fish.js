@@ -14,8 +14,30 @@ function getRandomFishName() {
   ];
   return fishNames[Math.floor(Math.random() * fishNames.length)];
 }
+
+function randFishColor(prevColor) {
+  prevColor = prevColor || lastColor;
+
+  do {
+    var color = choice(playerColors);
+    var col = new Color(color[0], color[1], color[2]);
+  } while (lastColor.equals(col));
+  lastColor = col;
+
+  return col;
+
+  var r = 0;
+  var g = 86;
+  var b = 255;
+  var offset = 100;
+  var value = (r + g + b) / 3;
+  var newVal = value + 2 * Math.random() * offset - offset;
+  var ratio = newVal / value;
+
+  return rgbToHex(r * ratio, g * ratio, b * ratio);
+}
 function Fish(AI, x, y, size, dir, frame) {
-  var randCol = randColor();
+  var randCol = randFishColor();
 
   this.dir = dir || 0; // radians
   this.AI = AI || false;
@@ -38,7 +60,7 @@ function Fish(AI, x, y, size, dir, frame) {
   this.curv = 0;
 
   // loaded percent is used for new colors that have been added and need to grow
-  this.colors = [{ col: randColor().rgb(), thick: 4, loaded: 1 }];
+  this.colors = [{ col: randCol.rgb(), thick: 4, loaded: 1 }];
 
   this.x = x || 0;
   this.y = y || 0;
@@ -49,6 +71,7 @@ function Fish(AI, x, y, size, dir, frame) {
   this.bodyColor = randCol.rgb();
   this.bodyOutline = randCol.rgb();
   this.name = AI ? getRandomFishName() : "";
+  this.color = randCol;
 
   // is the user currently pressing a button to move?
   this.isInput = AI ? true : false;
@@ -61,6 +84,9 @@ function Fish(AI, x, y, size, dir, frame) {
   this.accel = [0, 0];
   this.maxSpeed = this.AI ? 3 + Math.random() * 2 : 6;
   this.energy = this.size;
+
+  // Bubbles
+  this.bubbleParticles = [];
 }
 this.moveEnergy = 20;
 
@@ -80,6 +106,9 @@ Fish.prototype.draw = function (outputCtx) {
 
   // draw inner colors
   // this.drawColors();
+  if (this.boost) {
+    this.drawBubbles(outputCtx);
+  }
 
   // output to main canvas
   outputCtx.save();
@@ -90,7 +119,20 @@ Fish.prototype.draw = function (outputCtx) {
     -this.canv.width / 2 - this.size,
     -this.canv.height / 2
   );
+  console.log(this.canv.width, this.canv.height);
   outputCtx.restore();
+
+  if (this === GAME.player && GAME.state === "playing") {
+    // Ensure the text is aligned correctly relative to the canvas
+    outputCtx.save();
+    outputCtx.textAlign = "center"; // Center the text horizontally
+    outputCtx.textBaseline = "bottom"; // Align the text bottom
+    outputCtx.fillStyle = "#FFF"; // White color text
+    outputCtx.font = "20px Arial"; // Set font size and family
+    outputCtx.fillText(this.name, this.x, this.y - this.size * 0.6); // Position text above fish
+    outputCtx.restore();
+  }
+
   if (this.AI && this.name) {
     // Ensure the text is aligned correctly relative to the canvas
     outputCtx.save();
@@ -151,104 +193,111 @@ Fish.prototype.draw = function (outputCtx) {
   }
 };
 Fish.prototype.drawBody = function () {
-  var o = this.ossilation;
-  this.ctx.strokeStyle = this.bodyOutline;
-  this.ctx.fillStyle = this.bodyColor;
-  this.ctx.lineWidth = 6;
+  this.ctx.drawImage(
+    ASSETS["skin"],
+    -this.size * 3.5,
+    -this.size * 1.5,
+    this.size * 5,
+    this.size * 3
+  );
+  // var o = this.ossilation;
+  // this.ctx.strokeStyle = this.bodyOutline;
+  // this.ctx.fillStyle = this.bodyColor;
+  // this.ctx.lineWidth = 6;
 
-  for (var i = -1; i < 2; i += 2) {
-    this.ctx.moveTo(this.size, 0);
+  // for (var i = -1; i < 2; i += 2) {
+  //   this.ctx.moveTo(this.size, 0);
 
-    this.ctx.bezierCurveTo(
-      this.size * (14 / 15),
-      (i * this.size) / 2 + (this.size / 30) * o + this.curv / 3,
-      -this.size * (3 / 15),
-      (i * this.size * 9) / 15 + (this.size / 30) * o + this.curv / 2,
-      (-this.size * 1) / 4,
-      (i * this.size * 10) / 15 + (this.size / 15) * o + this.curv / 2
-    );
+  //   this.ctx.bezierCurveTo(
+  //     this.size * (14 / 15),
+  //     (i * this.size) / 2 + (this.size / 30) * o + this.curv / 3,
+  //     -this.size * (3 / 15),
+  //     (i * this.size * 9) / 15 + (this.size / 30) * o + this.curv / 2,
+  //     (-this.size * 1) / 4,
+  //     (i * this.size * 10) / 15 + (this.size / 15) * o + this.curv / 2
+  //   );
 
-    this.ctx.bezierCurveTo(
-      (-this.size * 9) / 15,
-      (i * this.size * 11) / 15 + (this.size / 30) * o + this.curv / 3,
-      (-this.size * 2) / 3,
-      (i * this.size * 5) / 5 + (this.size / 30) * o + this.curv / 2,
-      -this.size * 1,
-      (i * this.size * 16) / 15 + (this.size / 15) * o + this.curv
-    );
+  //   this.ctx.bezierCurveTo(
+  //     (-this.size * 9) / 15,
+  //     (i * this.size * 11) / 15 + (this.size / 30) * o + this.curv / 3,
+  //     (-this.size * 2) / 3,
+  //     (i * this.size * 5) / 5 + (this.size / 30) * o + this.curv / 2,
+  //     -this.size * 1,
+  //     (i * this.size * 16) / 15 + (this.size / 15) * o + this.curv
+  //   );
 
-    this.ctx.bezierCurveTo(
-      (-this.size * 14) / 15,
-      (i * this.size * 10) / 15 + (this.size / 30) * o + this.curv / 3,
-      (-this.size * 16) / 15,
-      (i * this.size * 6) / 15 + (this.size / 30) * o + this.curv / 2,
-      (-this.size * 16) / 15,
-      (i * this.size * 8) / 15 + (this.size / 15) * o + this.curv
-    );
+  //   this.ctx.bezierCurveTo(
+  //     (-this.size * 14) / 15,
+  //     (i * this.size * 10) / 15 + (this.size / 30) * o + this.curv / 3,
+  //     (-this.size * 16) / 15,
+  //     (i * this.size * 6) / 15 + (this.size / 30) * o + this.curv / 2,
+  //     (-this.size * 16) / 15,
+  //     (i * this.size * 8) / 15 + (this.size / 15) * o + this.curv
+  //   );
 
-    this.ctx.bezierCurveTo(
-      -this.size * 2.5,
-      (i * this.size) / 6 + (this.size / 10) * o + this.curv / 3,
-      -this.size * 2.6,
-      (i * this.size * 4) / 15 + (this.size / 15) * o + this.curv / 2,
-      -this.size * 3 - Math.sin((i * this.size) / Math.PI) * o * 2,
-      (i * this.size * 3) / 15 +
-        Math.cos((i * this.size) / Math.PI) * o * 2 +
-        (this.size / 15) * o +
-        this.curv / 3
-    );
+  //   this.ctx.bezierCurveTo(
+  //     -this.size * 2.5,
+  //     (i * this.size) / 6 + (this.size / 10) * o + this.curv / 3,
+  //     -this.size * 2.6,
+  //     (i * this.size * 4) / 15 + (this.size / 15) * o + this.curv / 2,
+  //     -this.size * 3 - Math.sin((i * this.size) / Math.PI) * o * 2,
+  //     (i * this.size * 3) / 15 +
+  //       Math.cos((i * this.size) / Math.PI) * o * 2 +
+  //       (this.size / 15) * o +
+  //       this.curv / 3
+  //   );
 
-    this.ctx.bezierCurveTo(
-      -this.size * 3.2,
-      (i * this.size * 3) / 15 + (this.size / 10) * o + this.curv / 3,
-      -this.size * 3.3,
-      (i * this.size * 9) / 15 + (this.size / 15) * o + this.curv / 2,
-      -this.size * 3.5 - Math.sin((i * this.size) / Math.PI) * o * 3,
-      (i * this.size * 8) / 15 +
-        Math.cos((i * this.size) / Math.PI) * o * 2 +
-        (this.size / 15) * o +
-        this.curv / 3
-    );
+  //   this.ctx.bezierCurveTo(
+  //     -this.size * 3.2,
+  //     (i * this.size * 3) / 15 + (this.size / 10) * o + this.curv / 3,
+  //     -this.size * 3.3,
+  //     (i * this.size * 9) / 15 + (this.size / 15) * o + this.curv / 2,
+  //     -this.size * 3.5 - Math.sin((i * this.size) / Math.PI) * o * 3,
+  //     (i * this.size * 8) / 15 +
+  //       Math.cos((i * this.size) / Math.PI) * o * 2 +
+  //       (this.size / 15) * o +
+  //       this.curv / 3
+  //   );
 
-    this.ctx.bezierCurveTo(
-      -this.size * 3.5,
-      (i * this.size * 5) / 15 + (this.size / 10) * o + this.curv / 3,
-      -this.size * 3.5,
-      (i * this.size * 3) / 15 + (this.size / 15) * o + this.curv / 2,
-      -this.size * 3.3,
-      (-this.size / 15) * o +
-        Math.cos((i * this.size) / Math.PI) * o * 4 +
-        (this.size / 15) * o +
-        this.curv / 3
-    );
+  //   this.ctx.bezierCurveTo(
+  //     -this.size * 3.5,
+  //     (i * this.size * 5) / 15 + (this.size / 10) * o + this.curv / 3,
+  //     -this.size * 3.5,
+  //     (i * this.size * 3) / 15 + (this.size / 15) * o + this.curv / 2,
+  //     -this.size * 3.3,
+  //     (-this.size / 15) * o +
+  //       Math.cos((i * this.size) / Math.PI) * o * 4 +
+  //       (this.size / 15) * o +
+  //       this.curv / 3
+  //   );
 
-    // this.ctx.bezierCurveTo(
-    //   -this.size * 2.5,
-    //   (i * this.size) / 6 + (this.size / 10) * o + this.curv,
-    //   -this.size * 3,
-    //   (i * this.size) / 4 - (this.size / 15) * o + this.curv / 2,
-    //   -this.size * 15 / 3,
-    //   (-this.size / 15) * o + this.curv / 3
-    // );
-  }
-  this.ctx.stroke();
-  this.ctx.fill();
+  //   // this.ctx.bezierCurveTo(
+  //   //   -this.size * 2.5,
+  //   //   (i * this.size) / 6 + (this.size / 10) * o + this.curv,
+  //   //   -this.size * 3,
+  //   //   (i * this.size) / 4 - (this.size / 15) * o + this.curv / 2,
+  //   //   -this.size * 15 / 3,
+  //   //   (-this.size / 15) * o + this.curv / 3
+  //   // );
+  // }
+  // this.ctx.stroke();
+  // this.ctx.fill();
 
   // Draw eyes
-  this.ctx.drawImage(
-    ASSETS["eye-" + this.eye],
-    this.size * (5 / 15),
-    -this.size * (7 / 15),
-    this.size / 3,
-    this.size / 3
-  );
-  this.ctx.drawImage(
-    ASSETS["eye-" + this.eye],
-    this.size * (5 / 15),
-    this.size * (2 / 15),
-    this.size / 3,
-    this.size / 3
-  );
+  // this.ctx.drawImage(
+  //   ASSETS["eye-" + this.eye],
+  //   this.size * (5 / 15),
+  //   -this.size * (7 / 15),
+  //   this.size / 3,
+  //   this.size / 3
+  // );
+  // this.ctx.drawImage(
+  //   ASSETS["eye-" + this.eye],
+  //   this.size * (5 / 15),
+  //   this.size * (2 / 15),
+  //   this.size / 3,
+  //   this.size / 3
+  // );
 };
 Fish.prototype.drawColors = function () {
   var i, l, c;
@@ -292,6 +341,11 @@ Fish.prototype.drawColors = function () {
 Fish.prototype.drawDeath = function (outputCtx) {
   for (var i = 0; i < this.deathParticles.length; i++) {
     this.deathParticles[i].draw(outputCtx);
+  }
+};
+Fish.prototype.drawBubbles = function (outputCtx) {
+  for (var i = 0; i < this.bubbleParticles.length; i++) {
+    this.bubbleParticles[i].draw(outputCtx);
   }
 };
 Fish.prototype.collide = function (fish) {
@@ -443,6 +497,9 @@ Fish.prototype.physics = function (player) {
     }
     if (!this.deathParticles.length) {
       this.dead = true;
+      if (this == player) {
+        GAME.state = "menu";
+      }
     }
   } else {
     // update collision circles
@@ -569,6 +626,20 @@ Fish.prototype.physics = function (player) {
     }
   }
 
+  if (this.boost) {
+    for (i = this.bubbleParticles.length - 1; i >= 0; i--) {
+      p = this.bubbleParticles[i];
+
+      if (p.dead === true) {
+        this.bubbleParticles.splice(i, 1);
+      }
+    }
+
+    if (this.bubbleParticles.length == 0) {
+      this.bubbleParticles = this.toBubbles();
+    }
+  }
+
   this.frame++;
 };
 var pi = Math.PI;
@@ -582,9 +653,63 @@ var dirMap = {
   left: pi,
   "left up": (-3 * pi) / 4,
 };
+Fish.prototype.toBubbles = function () {
+  var particles = [];
+
+  var pixels = this.ctx.getImageData(
+    0,
+    0,
+    this.canv.width,
+    this.canv.height
+  ).data;
+  for (
+    var i = 0;
+    i < pixels.length;
+    i += 36 * Math.ceil(this.size / 20) * (isMobile ? 6 : 1)
+  ) {
+    r = pixels[i];
+    g = pixels[i + 1];
+    b = pixels[i + 2];
+
+    // black pixel - no data
+    if (!r && !g && !b) {
+      continue;
+    }
+
+    var x = (i / 4) % this.canv.width;
+    var y = Math.floor(i / 4 / this.canv.width);
+    x -= this.canv.width / 2 + this.size;
+    y -= this.canv.height / 2;
+    var relativePos = rot(x, y, this.dir);
+    x = this.x + relativePos[0];
+    y = this.y + relativePos[1];
+
+    var dir = directionTowards({ x: x, y: y }, this);
+    const new_particle = new Particle(
+      x,
+      y,
+      this.color,
+      {
+        x: this.x,
+        y: this.y,
+      },
+      Math.PI * Math.random() * 2 - Math.PI,
+      1.5
+    );
+    setTimeout(function () {
+      new_particle.dead = true;
+    }, Math.random() * 700 + 100);
+    particles.push(new_particle);
+  }
+  return particles;
+};
 Fish.prototype.updateInput = function (input, isTouch, isBoost) {
   // remember that up is down and down is up because of coordinate system
   this.boost = isBoost;
+
+  if (this.boost) {
+    this.bubbleParticles = this.toBubbles();
+  }
 
   if (isTouch) {
     // touch input
@@ -616,8 +741,10 @@ Fish.prototype.updateInput = function (input, isTouch, isBoost) {
 };
 Fish.prototype.setSize = function (size) {
   this.size = size;
-  this.canv.width = this.size * 6.6;
-  this.canv.height = ~~this.size * 2.5;
+  this.canv.width = this.size * 5;
+  this.canv.height = ~~this.size * 3;
+  // this.canv.width = this.size * 6.6;
+  // this.canv.height = ~~this.size * 2.5;
   this.ctx = this.canv.getContext("2d");
   this.ctx.translate(this.canv.width / 2 + this.size, this.canv.height / 2);
 

@@ -15,9 +15,11 @@ function setGlobals() {
   window.devPixelRatio =
     (window.devicePixelRatio > 2 ? 2 : window.devicePixelRatio) || 1;
   window.$canv = document.getElementById("mainCanv");
+  window.$settingCanv = document.getElementById("settingCanv");
   $canv.width = window.innerWidth * devPixelRatio;
   $canv.height = window.innerHeight * devPixelRatio;
   window.ctx = $canv.getContext("2d");
+  window.settomgCtx = $settingCanv.getContext("2d");
   ctx.lineJoin = "round";
   window.debug = false; // true
 
@@ -42,7 +44,21 @@ function setGlobals() {
     [255, 192, 203], // Pink
     [128, 128, 0], // Olive
   ];
-  window.playerSize = [16, 18, 19, 22, 25, 28, 31, 34, 37, 40, 46];
+
+  window.playerSize = [16, 17, 19, 22, 25, 28, 31, 34, 37, 40, 46];
+  window.playerColors = [
+    [30, 144, 255], // 1E90FF
+    [15, 82, 186], // 0f52ba
+    [210, 20, 4], // D21404
+    [11, 102, 35], // 0B6623
+    [80, 200, 120], // 50C878
+    [255, 239, 0], // FFEFOO (Invalid color code)
+    [252, 108, 133], // FC6C85
+    [252, 142, 172], // FC8EAC
+    [197, 198, 199], // C5C6C7
+    [110, 111, 113], // 6E6F71
+    [229, 184, 11],
+  ];
 
   ctx.lineJoin = "round";
   window.debug = false; // true
@@ -105,11 +121,46 @@ function init() {
   GAME.endGameParticles = [];
   GAME.levelUpParticles = [];
   GAME.firstLoop = true;
+  score = 0;
   // Boost
   GAME.boostDuration = 0;
   var w = $canv.width * 0.1;
 
   GAME.smallMap = new SmallMap($canv.width - w - 40, 40, w, w, 0.1);
+  var playerNameInput = document.getElementById("menuTextInput");
+  var main = document.querySelector(".main");
+  if (playerNameInput && playerNameInput.value) {
+    GAME.player.name = playerNameInput.value;
+  } else {
+    // If no name was entered, you might want to set a default name
+    GAME.player.name = "Player";
+  }
+  main.style.display = "none";
+
+  var scoreElement = document.querySelector(".scoreText");
+  if (scoreElement) {
+    scoreElement.innerText = "0";
+  }
+
+  bgSound.pause();
+  bgSound.currentTime = 0; // Reset time to start
+
+  // Update the src attribute to the new sound file for 'playing' state
+  bgSound.src = "assets/Gameplay_Bg.mp3"; // Replace with the path to your in-game background sound
+
+  // Play the new background sound if not muted
+  if (!muted) {
+    bgSound.loop = true;
+    bgSound.volume = 0.6; // Set volume or keep it from previously set value
+    bgSound.addEventListener(
+      "canplaythrough",
+      function () {
+        bgSound.play();
+      },
+      { once: true }
+    ); // Add event listener to play sound when it's ready, and use 'once' option to auto-remove listener after firing once
+    bgSound.play(); // Attempt to play right away in case the sound is already loaded
+  }
   requestAnimFrame(draw);
 }
 
@@ -126,11 +177,17 @@ function draw(time) {
   var i, l, j, dist, nextStage, fish, fish2;
 
   lag += time - previousTime;
-  if (mouseDown && score > 0) {
+  if (mouseDown && score > 0 && GAME.state === "playing") {
     GAME.boostDuration += time - previousTime;
     if (GAME.boostDuration >= 1000) {
       GAME.boostDuration -= 1000;
       score--;
+      if (score == 0) {
+        pauseBoost();
+        if (window.isMobile) {
+          window.$boost.classList.remove("active");
+        }
+      }
       var scoreElement = document.querySelector(".scoreText");
       if (scoreElement) {
         scoreElement.innerText = score;
@@ -140,10 +197,40 @@ function draw(time) {
   previousTime = time;
 
   if (GAME.state === "playing") {
+    var iframe = document.getElementById("iframe");
+    iframe.style.display = "none";
     requestAnimFrame(function (t) {
       draw(t);
     });
-  } else {
+    var setting = document.getElementById("settingButton");
+    setting.style.display = "none";
+  } else if (GAME.state === "menu") {
+    ctx.clearRect(0, 0, $canv.width, $canv.height);
+    var iframe = document.getElementById("iframe");
+    iframe.style.display = "block";
+    var setting = document.getElementById("settingButton");
+    setting.style.display = "flex";
+    bgSound.pause();
+    bgSound.currentTime = 0; // Reset time to start
+
+    // Update the src attribute to the new sound file for 'playing' state
+    bgSound.src = "assets/Main_Menu_Bg.mp3"; // Replace with the path to your in-game background sound
+
+    // Play the new background sound if not muted
+    if (!muted) {
+      bgSound.loop = true;
+      bgSound.volume = 0.6; // Set volume or keep it from previously set value
+      bgSound.addEventListener(
+        "canplaythrough",
+        function () {
+          bgSound.play();
+        },
+        { once: true }
+      ); // Add event listener to play sound when it's ready, and use 'once' option to auto-remove listener after firing once
+      bgSound.play(); // Attempt to play right away in case the sound is already loaded
+    }
+    var scoreElement = document.querySelector(".scoreText");
+    scoreElement.innerText = "";
     if (window.isMobile) {
       $wheel.style.visibility = "hidden";
       $boost.style.visibility = "hidden";
@@ -436,11 +523,13 @@ function draw(time) {
 }
 function loadAssets(cb) {
   var imgs = [
-    { name: "logo", src: "assets/logo.png" },
-    { name: "logoSmall", src: "assets/logo-small.png" },
+    { name: "skin", src: "assets/skin.png" },
+    { name: "logo", src: "assets/title_text.png" },
+    { name: "logoSmall", src: "assets/title_text.png" },
     { name: "soundOn", src: "assets/sound-on.png" },
     { name: "soundOff", src: "assets/sound-off.png" },
-    { name: "enter", src: "assets/enter.png" },
+    { name: "enter", src: "assets/play_text.png" },
+    { name: "skinImage", src: "assets/left_bottom_fish.png" },
     { name: "eye-1", src: "assets/eyes/eye-1.png" },
     { name: "eye-2", src: "assets/eyes/eye-2.png" },
     { name: "eye-3", src: "assets/eyes/eye-3.png" },
@@ -526,7 +615,6 @@ function drawHexagon(x, y) {
   // Night gradient
   gradient.addColorStop(1, "#1a1a1a"); // Dark blue
   gradient.addColorStop(0, "#000000"); // Black
-
   ctx.beginPath();
   ctx.strokeStyle = "#00000C"; // Set line color to white
   ctx.fillStyle = gradient; // Set fill color to gradient
