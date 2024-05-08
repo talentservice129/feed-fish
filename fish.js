@@ -379,6 +379,7 @@ Fish.prototype.collide = function (fish) {
 };
 Fish.prototype.killedBy = function (target, score, user) {
   this.dying = true;
+  popSound.src = "assets/drop1.ogg";
   if (!this.AI || !target.AI) {
     playPop();
     if (user) {

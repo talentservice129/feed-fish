@@ -203,6 +203,9 @@ if (window.isMobile) {
     }
   });
   window.$boost.addEventListener("touchstart", (_) => {
+    popSound.src = "assets/boost_final.mp3";
+    popSound.play();
+    console.log(popSound.src);
     mouseDown = score > 0;
     if (mouseDown) {
       playBoost();
