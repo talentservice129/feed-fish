@@ -28,6 +28,8 @@ function resizeWindow() {
     GAME.levelBalls.resize($canv.width, $canv.height);
   } else if (GAME.state === "menu") {
     if (ASSETS.loaded) drawMenu();
+  } else if (GAME.state === "setting") {
+    drawChangeSkin();
   }
 }
 
@@ -62,6 +64,7 @@ function touchDown(e) {
     GAME.player.updateInput(
       [pos.x - $canv.width / 2, pos.y - $canv.height / 2],
       true,
+      // true
       mouseDown
     );
   }
@@ -141,18 +144,19 @@ function touchMove(e) {
   e.preventDefault();
   var pos = eventPos(e);
   if (GAME.state === "playing") {
+    // GAME.player.updateInput(
+    //   [pos.x - $canv.width / 2, pos.y - $canv.height / 2],
+    //   true,
+    //   false
+    // );
+    // if (mouseDown && score > 0) {
+    // if (mouseDown) {
     GAME.player.updateInput(
       [pos.x - $canv.width / 2, pos.y - $canv.height / 2],
       true,
-      false
+      mouseDown && score > 0
     );
-    if (mouseDown && score > 0) {
-      GAME.player.updateInput(
-        [pos.x - $canv.width / 2, pos.y - $canv.height / 2],
-        true,
-        true
-      );
-    }
+    // }
   }
 }
 
@@ -205,7 +209,6 @@ if (window.isMobile) {
   window.$boost.addEventListener("touchstart", (_) => {
     popSound.src = "assets/boost_final.mp3";
     popSound.play();
-    console.log(popSound.src);
     mouseDown = score > 0;
     if (mouseDown) {
       playBoost();
@@ -245,18 +248,36 @@ changeSkinElement.addEventListener("click", function (e) {
   GAME.state = "setting";
   var main = document.querySelector(".main");
   main.style.display = "none";
-  var fish = new Fish(
-    false,
-    $canv.width / 2,
-    $canv.height / 2,
-    30,
-    Math.PI / 4
-  );
+  changeSkinElement.style.display = "none";
+  document.querySelector(".change-skin").style.display = "block";
 
-  // Clear the canvas before drawing the new frame
+  drawChangeSkin();
+});
+
+document.querySelector(".prev-skin").addEventListener("click", function (e) {
+  GAME.playerSkin = ((GAME.playerSkin - 2 + 11) % 11) + 1;
+
+  drawChangeSkin();
+});
+
+document.querySelector(".next-skin").addEventListener("click", function (e) {
+  GAME.playerSkin = (GAME.playerSkin % 11) + 1;
+
+  drawChangeSkin();
+});
+
+document.querySelector(".select-skin").addEventListener("click", function () {
+  document.querySelector(".change-skin").style.display = "none";
+  GAME.state = "menu";
+  changeSkinElement.style.display = "flex";
+  var main = document.querySelector(".main");
+  main.style.display = "block";
   ctx.clearRect(0, 0, $canv.width, $canv.height);
+  drawMenu();
+});
 
-  // Draw the fish onto the setting canvas
-  fish.draw(ctx);
-  fish.drawBody(ctx);
+// Splash Screen
+var playBtn = document.querySelector(".play-btn");
+playBtn.addEventListener("click", function (e) {
+  document.querySelector(".splash-bg").style.display = "none";
 });

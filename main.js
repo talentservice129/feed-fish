@@ -70,6 +70,7 @@ function setGlobals() {
     MENU: {
       opacity: 1,
     },
+    playerSkin: Math.ceil(Math.random() * 11),
     state: "menu",
     firstLoop: true,
     bufferLoop: true,
@@ -106,6 +107,7 @@ loadAssets(fadeInMenu);
 function init() {
   GAME.state = "playing";
   GAME.player = new Fish(false);
+  GAME.player.skin = GAME.playerSkin;
   GAME.fishes = [GAME.player];
   GAME.spawner = new Spawner(
     $canv.width,
@@ -523,19 +525,23 @@ function draw(time) {
 }
 function loadAssets(cb) {
   var imgs = [
-    { name: "skin", src: "assets/skin.png" },
+    { name: "skin-1", src: "assets/skins/skin1.png" },
+    { name: "skin-2", src: "assets/skins/skin2.png" },
+    { name: "skin-3", src: "assets/skins/skin3.png" },
+    { name: "skin-5", src: "assets/skins/skin4.png" },
+    { name: "skin-4", src: "assets/skins/skin5.png" },
+    { name: "skin-6", src: "assets/skins/skin6.png" },
+    { name: "skin-7", src: "assets/skins/skin7.png" },
+    { name: "skin-8", src: "assets/skins/skin8.png" },
+    { name: "skin-9", src: "assets/skins/skin9.png" },
+    { name: "skin-10", src: "assets/skins/skin10.png" },
+    { name: "skin-11", src: "assets/skins/skin11.png" },
     { name: "logo", src: "assets/title_text.png" },
     { name: "logoSmall", src: "assets/title_text.png" },
     { name: "soundOn", src: "assets/sound-on.png" },
     { name: "soundOff", src: "assets/sound-off.png" },
     { name: "enter", src: "assets/play_text.png" },
     { name: "skinImage", src: "assets/left_bottom_fish.png" },
-    { name: "eye-1", src: "assets/eyes/eye-1.png" },
-    { name: "eye-2", src: "assets/eyes/eye-2.png" },
-    { name: "eye-3", src: "assets/eyes/eye-3.png" },
-    { name: "eye-4", src: "assets/eyes/eye-4.png" },
-    { name: "eye-5", src: "assets/eyes/eye-5.png" },
-    { name: "eye-6", src: "assets/eyes/eye-6.png" },
   ];
 
   function process() {
@@ -627,4 +633,21 @@ function drawHexagon(x, y) {
   ctx.closePath();
   ctx.fill(); // Fill hexagon with gradient color
   ctx.stroke(); // Draw hexagon outline with white lines
+}
+
+function drawChangeSkin() {
+  var fish = new Fish(
+    false,
+    $canv.width / 2,
+    $canv.height / 2,
+    30,
+    0,
+    0,
+    GAME.playerSkin
+  );
+  drawBackgroundCanvas(fish);
+
+  // Draw the fish onto the setting canvas
+  fish.draw(ctx);
+  fish.drawBody(ctx);
 }

@@ -36,7 +36,7 @@ function randFishColor(prevColor) {
 
   return rgbToHex(r * ratio, g * ratio, b * ratio);
 }
-function Fish(AI, x, y, size, dir, frame) {
+function Fish(AI, x, y, size, dir, frame, skin) {
   var randCol = randFishColor();
 
   this.dir = dir || 0; // radians
@@ -44,7 +44,7 @@ function Fish(AI, x, y, size, dir, frame) {
   this.targetDir = dir;
   this.arcSpeed = AI ? 0.12 : 0.14;
   this.canv = document.createElement("canvas");
-  this.circles = Array.apply([], new Array(6)).map(function (cir, i) {
+  this.circles = Array.apply([], new Array(7)).map(function (cir, i) {
     return {
       x: this.x,
       y: this.y,
@@ -67,7 +67,7 @@ function Fish(AI, x, y, size, dir, frame) {
   this.dying = false; // death animation
   this.dead = false; // remove this entity
   this.deathParticles = [];
-  this.eye = Math.ceil(Math.random() * 6);
+  this.skin = skin ?? Math.ceil(Math.random() * 11);
   this.bodyColor = randCol.rgb();
   this.bodyOutline = randCol.rgb();
   this.name = AI ? getRandomFishName() : "";
@@ -119,7 +119,6 @@ Fish.prototype.draw = function (outputCtx) {
     -this.canv.width / 2 - this.size,
     -this.canv.height / 2
   );
-  console.log(this.canv.width, this.canv.height);
   outputCtx.restore();
 
   if (this === GAME.player && GAME.state === "playing") {
@@ -194,7 +193,7 @@ Fish.prototype.draw = function (outputCtx) {
 };
 Fish.prototype.drawBody = function () {
   this.ctx.drawImage(
-    ASSETS["skin"],
+    ASSETS["skin-" + this.skin],
     -this.size * 3.5,
     -this.size * 1.5,
     this.size * 5,
@@ -344,9 +343,12 @@ Fish.prototype.drawDeath = function (outputCtx) {
   }
 };
 Fish.prototype.drawBubbles = function (outputCtx) {
+  outputCtx.save();
+  outputCtx.globalAlpha = 0.2;
   for (var i = 0; i < this.bubbleParticles.length; i++) {
     this.bubbleParticles[i].draw(outputCtx);
   }
+  outputCtx.restore();
 };
 Fish.prototype.collide = function (fish) {
   // the fish has been killed and is being removed
@@ -686,10 +688,11 @@ Fish.prototype.toBubbles = function () {
     y = this.y + relativePos[1];
 
     var dir = directionTowards({ x: x, y: y }, this);
+    var col = new Color(r, g, b);
     const new_particle = new Particle(
       x,
       y,
-      this.color,
+      col,
       {
         x: this.x,
         y: this.y,
@@ -706,11 +709,11 @@ Fish.prototype.toBubbles = function () {
 };
 Fish.prototype.updateInput = function (input, isTouch, isBoost) {
   // remember that up is down and down is up because of coordinate system
-  this.boost = isBoost;
-
-  if (this.boost) {
+  if (this.boost == false && this.isBoost == true) {
     this.bubbleParticles = this.toBubbles();
   }
+
+  this.boost = isBoost;
 
   if (isTouch) {
     // touch input
@@ -749,17 +752,30 @@ Fish.prototype.setSize = function (size) {
   this.ctx = this.canv.getContext("2d");
   this.ctx.translate(this.canv.width / 2 + this.size, this.canv.height / 2);
 
-  var ratios = [11 / 14, 12 / 15, 10 / 15, 7 / 15, 4 / 14, 3 / 15];
+  var ratios = [
+    10 / 14,
+    11 / 14,
+    12 / 15,
+    10 / 15,
+    7 / 15,
+    4 / 14,
+    3 / 14,
+    4 / 14,
+  ];
   for (var i = 0; i < this.circles.length; i++) {
     this.circles[i].r = this.size * ratios[i];
   }
 
   this.circleMap = [
+    [this.size, this.size / 10],
     [this.size / 5, this.size / 40],
     [-this.size / 3, this.size / 30],
     [-this.size, this.size / 20],
     [-this.size * 1.6, this.size / 15],
     [-this.size * 2.2, this.size / 12],
     [-this.size * 2.8, -this.size / 30],
+    // [-this.size * 2.8, -this.size / 30],
+    // [-this.size * 2.8, -this.size / 30],
+    // [-this.size * 2.8, -this.size / 30],
   ];
 };
