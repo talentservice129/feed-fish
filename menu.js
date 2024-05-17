@@ -165,7 +165,7 @@ function drawBestScore() {
 
   ctx.fillText("Level: " + level, 20, 12);
   ctx.textAlign = "right";
-  ctx.fillText("Score: " + score, $canv.width - 75, 12);
+  ctx.fillText("Score: " + score, $canv.width - 20, 12);
 
   ctx.restore();
 }

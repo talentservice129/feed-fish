@@ -80,10 +80,10 @@ function touchDown(e) {
   // audio
   if (
     collideBox(pos, {
-      x: $canv.width - 25,
-      y: 10,
-      width: 20,
-      height: 20,
+      x: $canv.width - 50,
+      y: $canv.height - 105,
+      width: 30,
+      height: 30,
     })
   ) {
     toggleMute();
@@ -91,8 +91,8 @@ function touchDown(e) {
   // sound
   if (
     collideBox(pos, {
-      x: $canv.width - 60,
-      y: 10,
+      x: $canv.width - 100,
+      y: $canv.height - 105,
       width: 20,
       height: 20,
     })

@@ -1,5 +1,5 @@
-var muted = false;
-var soundMuted = false;
+var muted = localStorage.muted == "true";
+var soundMuted = localStorage.soundMuted == "true";
 var about = false;
 
 popSound = document.createElement("audio");
@@ -42,11 +42,13 @@ function toggleSoundMute() {
     popSound.volume = 0;
     boostSound.volume = 0;
     soundMuted = true;
+    localStorage.soundMuted = "true";
     drawSoundControl();
   } else {
     popSound.volume = 0.6;
     boostSound.volume = 0.6;
     soundMuted = false;
+    localStorage.soundMuted = "false";
     drawSoundControl();
   }
 }
@@ -82,14 +84,41 @@ function pauseBoost() {
 function drawSoundControl() {
   if (typeof ctx === "undefined") return;
   if (GAME.state !== "playing") {
-    ctx.fillStyle = "#0E151D";
-    ctx.clearRect($canv.width - 60, 10, 55, 20);
-    if (muted) ctx.drawImage(ASSETS.soundOff, $canv.width - 25, 10, 20, 20);
-    else ctx.drawImage(ASSETS.soundOn, $canv.width - 25, 10, 20, 20);
+    // ctx.fillStyle = "#0E151D";
+    // ctx.clearRect($canv.width - 100, $canv.height - 105, 80, 30);
+    if (muted)
+      ctx.drawImage(
+        ASSETS.soundOff,
+        $canv.width - 50,
+        $canv.height - 105,
+        30,
+        30
+      );
+    else
+      ctx.drawImage(
+        ASSETS.soundOn,
+        $canv.width - 50,
+        $canv.height - 105,
+        30,
+        30
+      );
 
     if (soundMuted)
-      ctx.drawImage(ASSETS.volumnOff, $canv.width - 60, 10, 20, 20);
-    else ctx.drawImage(ASSETS.volumnOn, $canv.width - 60, 10, 20, 20);
+      ctx.drawImage(
+        ASSETS.volumnOff,
+        $canv.width - 100,
+        $canv.height - 105,
+        30,
+        30
+      );
+    else
+      ctx.drawImage(
+        ASSETS.volumnOn,
+        $canv.width - 100,
+        $canv.height - 105,
+        30,
+        30
+      );
   }
 
   // if (GAME.state === "menu" && about) {
