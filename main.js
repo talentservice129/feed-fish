@@ -15,11 +15,11 @@ function setGlobals() {
   window.devPixelRatio =
     (window.devicePixelRatio > 2 ? 2 : window.devicePixelRatio) || 1;
   window.$canv = document.getElementById("mainCanv");
-  window.$settingCanv = document.getElementById("settingCanv");
+  // window.$settingCanv = document.getElementById("settingCanv");
   $canv.width = window.innerWidth * devPixelRatio;
   $canv.height = window.innerHeight * devPixelRatio;
   window.ctx = $canv.getContext("2d");
-  window.settomgCtx = $settingCanv.getContext("2d");
+  // window.settomgCtx = $settingCanv.getContext("2d");
   ctx.lineJoin = "round";
   window.debug = false; // true
 
@@ -70,7 +70,7 @@ function setGlobals() {
     MENU: {
       opacity: 1,
     },
-    playerSkin: Math.ceil(Math.random() * 11),
+    playerSkin: localStorage.skin ?? Math.ceil(Math.random() * 11),
     state: "menu",
     firstLoop: true,
     bufferLoop: true,
@@ -98,6 +98,12 @@ function setGlobals() {
       // color: "red",
     };
     window.$wheelManager = nipplejs.create(options);
+  }
+
+  // Player name from storage
+  var textInput = document.getElementById("menuTextInput");
+  if (textInput) {
+    textInput.value = localStorage.player ?? "";
   }
 }
 
@@ -138,6 +144,7 @@ function init() {
     GAME.player.name = "Player";
   }
   main.style.display = "none";
+  localStorage.player = GAME.player.name;
 
   var scoreElement = document.querySelector(".scoreText");
   if (scoreElement) {
@@ -297,6 +304,7 @@ function draw(time) {
     paintLevelParticles();
     paintLevelUpParticles();
     paintLevelBallParticles();
+    paintLevel();
     // levelBalls.draw(ctx);
 
     // dynamic position objects
@@ -519,8 +527,18 @@ function draw(time) {
       }
     }
   }
+
   function smallmap() {
     GAME.smallMap.draw(player, fishes);
+  }
+
+  function paintLevel() {
+    ctx.save();
+    ctx.font = "bolder 28px cursive";
+    ctx.textAlign = "left";
+    ctx.fillStyle = "white";
+    ctx.fillText("LV" + (GAME.level + 1), 20, 50);
+    ctx.restore();
   }
 }
 function loadAssets(cb) {

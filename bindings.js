@@ -67,6 +67,9 @@ function touchDown(e) {
       // true
       mouseDown
     );
+    if (mouseDown) {
+      playBoost();
+    }
   }
 
   // audio
@@ -128,6 +131,7 @@ function touchUp(e) {
   if (GAME.state === "playing") {
     GAME.player.updateInput([], true, false);
     mouseDown = false;
+    pauseBoost();
   }
   // else if (GAME.state === "menu" && GAME.MENU.button) {
   //   drawMenuButton(initializeOnUp);
@@ -207,8 +211,6 @@ if (window.isMobile) {
     }
   });
   window.$boost.addEventListener("touchstart", (_) => {
-    popSound.src = "assets/boost_final.mp3";
-    popSound.play();
     mouseDown = score > 0;
     if (mouseDown) {
       playBoost();
@@ -225,6 +227,7 @@ if (window.isMobile) {
   });
 }
 
+// Player name
 var textInput = document.getElementById("menuTextInput");
 textInput.addEventListener("input", function (event) {
   if (GAME && GAME.player) {
@@ -232,6 +235,7 @@ textInput.addEventListener("input", function (event) {
   }
 });
 
+// Play button
 var play = document.querySelector(".play");
 play.addEventListener("click", function () {
   if (GAME.state === "menu") {
@@ -243,6 +247,7 @@ play.addEventListener("click", function () {
   }
 });
 
+// Change Skin
 changeSkinElement = document.getElementById("settingButton");
 changeSkinElement.addEventListener("click", function (e) {
   GAME.state = "setting";
@@ -268,6 +273,7 @@ document.querySelector(".next-skin").addEventListener("click", function (e) {
 
 document.querySelector(".select-skin").addEventListener("click", function () {
   document.querySelector(".change-skin").style.display = "none";
+  localStorage.skin = GAME.playerSkin;
   GAME.state = "menu";
   changeSkinElement.style.display = "flex";
   var main = document.querySelector(".main");
@@ -280,4 +286,5 @@ document.querySelector(".select-skin").addEventListener("click", function () {
 var playBtn = document.querySelector(".play-btn");
 playBtn.addEventListener("click", function (e) {
   document.querySelector(".splash-bg").style.display = "none";
+  playBG();
 });

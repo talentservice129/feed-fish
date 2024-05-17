@@ -381,7 +381,6 @@ Fish.prototype.collide = function (fish) {
 };
 Fish.prototype.killedBy = function (target, score, user) {
   this.dying = true;
-  popSound.src = "assets/drop1.ogg";
   if (!this.AI || !target.AI) {
     playPop();
     if (user) {
@@ -501,6 +500,13 @@ Fish.prototype.physics = function (player) {
     if (!this.deathParticles.length) {
       this.dead = true;
       if (this == player) {
+        // Save best score and level to local storage
+        let currentScore = localStorage.score ?? 0,
+          currentLvl = localStorage.level ?? 1;
+        localStorage.score = Math.max(currentScore, score);
+        localStorage.level = Math.max(currentLvl, 1.0 * GAME.level + 1);
+        pauseBoost();
+
         GAME.state = "menu";
       }
     }

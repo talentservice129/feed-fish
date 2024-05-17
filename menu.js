@@ -54,9 +54,8 @@ function positionTextInput(textInput) {
 function drawMenu() {
   sizeMenu();
   drawMenuLogo();
-  // drawMenuButton();
-  // drawSoundControl();
-  // createTextInput();
+  drawSoundControl();
+  drawBestScore();
 }
 
 function drawMenuLogo() {
@@ -151,4 +150,22 @@ function sizeMenu() {
     usingSmallLogo = false;
     sizeMenu();
   }
+}
+
+// Best Score
+function drawBestScore() {
+  ctx.save();
+  ctx.font = "normal 24px Arial";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "top";
+  ctx.fillStyle = "#ececec";
+
+  let level = localStorage.level ?? 1;
+  let score = localStorage.score ?? 0;
+
+  ctx.fillText("Level: " + level, 20, 12);
+  ctx.textAlign = "right";
+  ctx.fillText("Score: " + score, $canv.width - 40, 12);
+
+  ctx.restore();
 }
