@@ -16,6 +16,11 @@ var mouseDown = false;
 var initializeOnUp = false;
 
 window.onresize = resizeWindow;
+document.addEventListener("visibilitychange", function () {
+  if (document.visibilityState === "visible") {
+    resizeWindow();
+  }
+});
 function resizeWindow() {
   $canv.width = (window.innerWidth * devPixelRatio * quality) / 10;
   $canv.height = (window.innerHeight * devPixelRatio * quality) / 10;
@@ -78,10 +83,21 @@ function touchDown(e) {
       x: $canv.width - 25,
       y: 10,
       width: 20,
-      height: 26,
+      height: 20,
     })
   ) {
     toggleMute();
+  }
+  // sound
+  if (
+    collideBox(pos, {
+      x: $canv.width - 60,
+      y: 10,
+      width: 20,
+      height: 20,
+    })
+  ) {
+    toggleSoundMute();
   }
 
   if (!about) {

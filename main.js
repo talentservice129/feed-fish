@@ -556,8 +556,10 @@ function loadAssets(cb) {
     { name: "skin-11", src: "assets/skins/skin11.png" },
     { name: "logo", src: "assets/title_text.png" },
     { name: "logoSmall", src: "assets/title_text.png" },
-    { name: "soundOn", src: "assets/sound-on.png" },
-    { name: "soundOff", src: "assets/sound-off.png" },
+    { name: "soundOn", src: "assets/music_on.png" },
+    { name: "soundOff", src: "assets/music_off.png" },
+    { name: "volumnOn", src: "assets/sound_on.png" },
+    { name: "volumnOff", src: "assets/sound_off.png" },
     { name: "enter", src: "assets/play_text.png" },
     { name: "skinImage", src: "assets/left_bottom_fish.png" },
   ];

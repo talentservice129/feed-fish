@@ -1,4 +1,5 @@
 var muted = false;
+var soundMuted = false;
 var about = false;
 
 popSound = document.createElement("audio");
@@ -19,19 +20,33 @@ bgSound.volume = 0.4;
 
 function toggleMute() {
   if (!muted) {
-    popSound.volume = 0;
-    boostSound.volume = 0;
+    // popSound.volume = 0;
+    // boostSound.volume = 0;
     bgSound.volume = 0;
     muted = true;
     localStorage.muted = "true";
     drawSoundControl();
   } else {
-    popSound.volume = 0.6;
-    boostSound.volume = 0.6;
+    // popSound.volume = 0.6;
+    // boostSound.volume = 0.6;
     bgSound.volume = 0.4;
     muted = false;
     localStorage.muted = "false";
     bgSound.play();
+    drawSoundControl();
+  }
+}
+
+function toggleSoundMute() {
+  if (!soundMuted) {
+    popSound.volume = 0;
+    boostSound.volume = 0;
+    soundMuted = true;
+    drawSoundControl();
+  } else {
+    popSound.volume = 0.6;
+    boostSound.volume = 0.6;
+    soundMuted = false;
     drawSoundControl();
   }
 }
@@ -45,7 +60,6 @@ function playBoost() {
 }
 
 function playBG() {
-  console.log(muted);
   if (!muted) {
     bgSound.loop = true;
     bgSound.volume = 0.6; // Set volume or keep it from previously set value
@@ -67,11 +81,15 @@ function pauseBoost() {
 
 function drawSoundControl() {
   if (typeof ctx === "undefined") return;
-  ctx.clearRect($canv.width - 25, 10, 20, 26);
-  ctx.fillStyle = "#0E151D";
   if (GAME.state !== "playing") {
-    if (muted) ctx.drawImage(ASSETS.soundOff, $canv.width - 25, 10);
-    else ctx.drawImage(ASSETS.soundOn, $canv.width - 25, 10);
+    ctx.fillStyle = "#0E151D";
+    ctx.clearRect($canv.width - 60, 10, 55, 20);
+    if (muted) ctx.drawImage(ASSETS.soundOff, $canv.width - 25, 10, 20, 20);
+    else ctx.drawImage(ASSETS.soundOn, $canv.width - 25, 10, 20, 20);
+
+    if (soundMuted)
+      ctx.drawImage(ASSETS.volumnOff, $canv.width - 60, 10, 20, 20);
+    else ctx.drawImage(ASSETS.volumnOn, $canv.width - 60, 10, 20, 20);
   }
 
   // if (GAME.state === "menu" && about) {
