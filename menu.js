@@ -163,9 +163,9 @@ function drawBestScore() {
   let level = localStorage.level ?? 1;
   let score = localStorage.score ?? 0;
 
-  ctx.fillText("Level: " + level, 20, 12);
+  ctx.fillText("Best Level: " + level, 20, 12);
   ctx.textAlign = "right";
-  ctx.fillText("Score: " + score, $canv.width - 20, 12);
+  ctx.fillText("Best Score: " + score, $canv.width - 20, 12);
 
   ctx.restore();
 }

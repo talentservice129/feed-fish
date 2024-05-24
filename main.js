@@ -537,7 +537,7 @@ function draw(time) {
     ctx.font = "bolder 28px cursive";
     ctx.textAlign = "left";
     ctx.fillStyle = "white";
-    ctx.fillText("LV" + (GAME.level + 1), 20, 50);
+    ctx.fillText("LEVEL" + (GAME.level + 1), 20, 50);
     ctx.restore();
   }
 }

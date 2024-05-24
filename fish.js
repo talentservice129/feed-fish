@@ -508,6 +508,11 @@ Fish.prototype.physics = function (player) {
         pauseBoost();
 
         GAME.state = "menu";
+        var play = document.querySelector(".play.loading");
+        if (play) {
+          play.innerHTML = "Play";
+          play.classList.remove("loading");
+        }
       }
     }
   } else {

@@ -253,7 +253,9 @@ textInput.addEventListener("input", function (event) {
 
 // Play button
 var play = document.querySelector(".play");
-play.addEventListener("click", function () {
+play.addEventListener("click", function (e) {
+  e.target.innerHTML = "Loading";
+  e.target.classList.add("loading");
   if (GAME.state === "menu") {
     if (window.isMobile) {
       $wheel.style.visibility = "visible";

@@ -95,6 +95,10 @@
   border-radius: 25px;
 }
 
+.play.loading {
+  pointer-events: none;
+}
+
 .splash-bg {
   position: fixed;
   left: 0;
