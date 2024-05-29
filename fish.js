@@ -67,7 +67,7 @@ function Fish(AI, x, y, size, dir, frame, skin) {
   this.dying = false; // death animation
   this.dead = false; // remove this entity
   this.deathParticles = [];
-  this.skin = skin ?? Math.ceil(Math.random() * 11);
+  this.skin = skin ?? Math.ceil(Math.random() * 26);
   this.bodyColor = randCol.rgb();
   this.bodyOutline = randCol.rgb();
   this.name = AI ? getRandomFishName() : "";

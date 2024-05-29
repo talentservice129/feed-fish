@@ -278,13 +278,13 @@ changeSkinElement.addEventListener("click", function (e) {
 });
 
 document.querySelector(".prev-skin").addEventListener("click", function (e) {
-  GAME.playerSkin = ((GAME.playerSkin - 2 + 11) % 11) + 1;
+  GAME.playerSkin = ((GAME.playerSkin - 2 + 26) % 26) + 1;
 
   drawChangeSkin();
 });
 
 document.querySelector(".next-skin").addEventListener("click", function (e) {
-  GAME.playerSkin = (GAME.playerSkin % 11) + 1;
+  GAME.playerSkin = (GAME.playerSkin % 26) + 1;
 
   drawChangeSkin();
 });
