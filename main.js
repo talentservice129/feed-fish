@@ -426,6 +426,11 @@ function draw(time) {
               scoreElement.innerText = score;
             }
             GAME.state = "menu";
+            var play = document.querySelector(".play.loading");
+            if (play) {
+              play.innerHTML = "Play";
+              play.classList.remove("loading");
+            }
           }, 3000);
         }
         fishes.splice(i, 1);
